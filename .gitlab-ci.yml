@@ -1,0 +1,22 @@
+# Используем официальный образ с компилятором GCC
+image: gcc:latest
+
+stages:
+  - build
+
+compile_job:
+  stage: build
+  script:
+    # Создаем папку для результата, если нужно
+    - mkdir -p build
+    # Компилируем main.cpp в исполняемый файл 'my_app' внутри папки build
+    - g++ main.cpp -o build/my_app
+    # Проверяем, что файл создался (выведем сообщение в консоль)
+    - echo "Compilation complete. Checking file..."
+    - ls -l build/
+  artifacts:
+    # Указываем GitLab сохранить содержимое папки build как артефакт
+    paths:
+      - build/
+    # Артефакт будет доступен для скачивания в течение 1 недели
+    expire_in: 1 week
