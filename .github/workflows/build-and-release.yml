@@ -1,0 +1,39 @@
+name: "Build, Package and Release"
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Дозволяє запускати вручну з вкладки Actions
+
+jobs:
+  build-and-release:
+    name: Build C++ and Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Завантажуємо код лаби на сервер
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. КОМПІЛЯЦІЯ (Завдання 2): Створюємо виконуваний файл
+      - name: Compile C++ Application
+        run: |
+          g++ main.cpp -o my_compiled_program
+
+      # 3. ПАКУВАННЯ (Завдання 2): Робимо з нього zip-архів
+      - name: Create artifact archive
+        uses: vimtor/action-zip@v1.2
+        with:
+          files: my_compiled_program
+          dest: artifact.zip
+
+      # 4. РЕЛІЗ (Завдання 3): Публікуємо архів на GitHub
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "artifact.zip"
+          tag: ${{ vars.VERSION }}     # Візьме версію з Settings
+          name: "Release ${{ vars.VERSION }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
